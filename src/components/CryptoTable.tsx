@@ -1,24 +1,13 @@
 import React, { useState } from "react";
-import { Search, ArrowUpDown } from "lucide-react";
-import { cryptoAssets, formatPrice, formatMarketCap, type CryptoAsset } from "@/data/cryptoData";
+import { Search, ArrowUpDown, Loader2 } from "lucide-react";
+import { useCryptoAssets } from "@/hooks/useCrypto";
+import { formatPrice, formatMarketCap, type CryptoAsset } from "@/data/cryptoData";
 import Sparkline from "./Sparkline";
-
-const symbolColors: Record<string, string> = {
-  BTC: "bg-[hsl(38,90%,50%)]",
-  ETH: "bg-[hsl(230,60%,55%)]",
-  USDT: "bg-[hsl(160,70%,40%)]",
-  SOL: "bg-[hsl(270,70%,55%)]",
-  BNB: "bg-[hsl(45,90%,50%)]",
-  XRP: "bg-[hsl(210,10%,35%)]",
-  ADA: "bg-[hsl(210,70%,50%)]",
-  DOGE: "bg-[hsl(40,80%,55%)]",
-  AVAX: "bg-[hsl(0,70%,50%)]",
-  DOT: "bg-[hsl(330,70%,55%)]",
-};
 
 type SortField = "rank" | "price" | "change24h" | "marketCap";
 
 const CryptoTable: React.FC = () => {
+  const { data, isLoading } = useCryptoAssets();
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField>("rank");
   const [sortAsc, setSortAsc] = useState(true);
@@ -28,7 +17,7 @@ const CryptoTable: React.FC = () => {
     else { setSortField(field); setSortAsc(field === "rank"); }
   };
 
-  const filtered = cryptoAssets
+  const filtered = (data ?? [])
     .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.symbol.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       const diff = a[sortField] - b[sortField];
@@ -58,26 +47,32 @@ const CryptoTable: React.FC = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="text-xs text-muted-foreground uppercase tracking-wider">
-              <th className="text-left px-5 py-3"><SortHeader field="rank">#</SortHeader></th>
-              <th className="text-left px-5 py-3">Name</th>
-              <th className="text-right px-5 py-3"><SortHeader field="price">Price</SortHeader></th>
-              <th className="text-right px-5 py-3"><SortHeader field="change24h">24h %</SortHeader></th>
-              <th className="text-right px-5 py-3 hidden md:table-cell"><SortHeader field="marketCap">Market Cap</SortHeader></th>
-              <th className="text-right px-5 py-3 hidden lg:table-cell">Volume (24h)</th>
-              <th className="text-right px-5 py-3 hidden lg:table-cell">Last 24h</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((coin) => (
-              <CryptoRow key={coin.id} coin={coin} />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-xs text-muted-foreground uppercase tracking-wider">
+                <th className="text-left px-5 py-3"><SortHeader field="rank">#</SortHeader></th>
+                <th className="text-left px-5 py-3">Name</th>
+                <th className="text-right px-5 py-3"><SortHeader field="price">Price</SortHeader></th>
+                <th className="text-right px-5 py-3"><SortHeader field="change24h">24h %</SortHeader></th>
+                <th className="text-right px-5 py-3 hidden md:table-cell"><SortHeader field="marketCap">Market Cap</SortHeader></th>
+                <th className="text-right px-5 py-3 hidden lg:table-cell">Volume (24h)</th>
+                <th className="text-right px-5 py-3 hidden lg:table-cell">Last 7d</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((coin) => (
+                <CryptoRow key={coin.id} coin={coin} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
@@ -89,9 +84,7 @@ const CryptoRow: React.FC<{ coin: CryptoAsset }> = ({ coin }) => {
       <td className="px-5 py-4 text-sm text-muted-foreground font-mono">{coin.rank}</td>
       <td className="px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-full ${symbolColors[coin.symbol] || "bg-muted"} flex items-center justify-center text-xs font-bold text-primary-foreground`}>
-            {coin.symbol.slice(0, 2)}
-          </div>
+          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
           <div>
             <span className="font-medium text-sm">{coin.name}</span>
             <span className="text-xs text-muted-foreground ml-2">{coin.symbol}</span>
@@ -108,7 +101,7 @@ const CryptoRow: React.FC<{ coin: CryptoAsset }> = ({ coin }) => {
       <td className="px-5 py-4 text-right font-mono text-sm text-muted-foreground hidden lg:table-cell">{formatMarketCap(coin.volume24h)}</td>
       <td className="px-5 py-4 text-right hidden lg:table-cell">
         <div className="flex justify-end">
-          <Sparkline data={coin.sparkline} positive={isPositive} />
+          {coin.sparkline.length > 0 && <Sparkline data={coin.sparkline} positive={isPositive} />}
         </div>
       </td>
     </tr>
