@@ -1,10 +1,30 @@
-import React from "react";
-import { Activity } from "lucide-react";
+import React, { useState } from "react";
+import { Activity, Bell, LogOut, LogIn } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useCryptoAssets } from "@/hooks/useCrypto";
 import MarketStats from "@/components/MarketStats";
 import TopCryptoCards from "@/components/TopCryptoCards";
 import CryptoTable from "@/components/CryptoTable";
+import FloatingActions from "@/components/FloatingActions";
+import PriceAlertModal from "@/components/PriceAlertModal";
+import { toast } from "sonner";
 
 const Index: React.FC = () => {
+  const { user, signOut } = useAuth();
+  const { data: coins } = useCryptoAssets();
+  const [alertOpen, setAlertOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleAlertClick = () => {
+    if (!user) {
+      toast.error("Please sign in to set price alerts");
+      navigate("/auth");
+      return;
+    }
+    setAlertOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/50 px-6 py-4">
@@ -13,9 +33,35 @@ const Index: React.FC = () => {
             <Activity className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-bold tracking-tight">CryptoTracker</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse-glow" />
-            <span className="text-xs text-muted-foreground">Live</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse-glow" />
+              <span className="text-xs text-muted-foreground">Live</span>
+            </div>
+            <button
+              onClick={handleAlertClick}
+              className="flex items-center gap-1.5 bg-secondary text-secondary-foreground px-3 py-1.5 rounded-lg text-sm hover:opacity-80 transition-opacity"
+            >
+              <Bell className="w-4 h-4" />
+              <span className="hidden sm:inline">Alerts</span>
+            </button>
+            {user ? (
+              <button
+                onClick={signOut}
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/auth")}
+                className="flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
+              >
+                <LogIn className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign In</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -25,6 +71,9 @@ const Index: React.FC = () => {
         <TopCryptoCards />
         <CryptoTable />
       </main>
+
+      <FloatingActions />
+      <PriceAlertModal open={alertOpen} onClose={() => setAlertOpen(false)} coins={coins ?? []} />
     </div>
   );
 };
