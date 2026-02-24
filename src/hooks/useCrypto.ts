@@ -5,14 +5,14 @@ export const useCryptoAssets = () =>
   useQuery({
     queryKey: ["cryptoAssets"],
     queryFn: fetchCryptoAssets,
-    refetchInterval: 60000,
-    staleTime: 30000,
+    refetchInterval: 10000,
+    staleTime: 5000,
   });
 
 export const useMarketGlobal = () =>
   useQuery({
     queryKey: ["marketGlobal"],
     queryFn: fetchMarketGlobal,
-    refetchInterval: 60000,
-    staleTime: 30000,
+    refetchInterval: 10000,
+    staleTime: 5000,
   });
