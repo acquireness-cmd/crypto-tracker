@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Activity, Bell, LogOut, LogIn } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useCryptoAssets } from "@/hooks/useCrypto";
@@ -34,6 +35,7 @@ const Index: React.FC = () => {
             <h1 className="text-xl font-bold tracking-tight">CryptoTracker</h1>
           </div>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse-glow" />
               <span className="text-xs text-muted-foreground">Live</span>
