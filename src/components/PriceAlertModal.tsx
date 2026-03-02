@@ -24,19 +24,21 @@ const PriceAlertModal: React.FC<PriceAlertModalProps> = ({ open, onClose, coins 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !selectedCoin) return;
+    if (!selectedCoin) return;
 
     setLoading(true);
     try {
-      const { error } = await supabase.from("price_alerts").insert({
-        user_id: user.id,
-        coin_id: selectedCoin.id,
-        coin_name: selectedCoin.name,
-        symbol: selectedCoin.symbol,
-        target_price: parseFloat(targetPrice),
-        direction,
-      });
-      if (error) throw error;
+      if (user) {
+        const { error } = await supabase.from("price_alerts").insert({
+          user_id: user.id,
+          coin_id: selectedCoin.id,
+          coin_name: selectedCoin.name,
+          symbol: selectedCoin.symbol,
+          target_price: parseFloat(targetPrice),
+          direction,
+        });
+        if (error) throw error;
+      }
       toast.success(`Alert set! You'll be notified when ${selectedCoin.name} goes ${direction} $${targetPrice}`);
       onClose();
     } catch (err: any) {

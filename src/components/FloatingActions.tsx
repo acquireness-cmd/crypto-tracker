@@ -2,22 +2,12 @@ import React, { useState } from "react";
 import { Bot, UserCheck } from "lucide-react";
 import AIChatDrawer from "./AIChatDrawer";
 import AdvisorContact from "./AdvisorContact";
-import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 
 const FloatingActions: React.FC = () => {
   const [aiOpen, setAiOpen] = useState(false);
   const [advisorOpen, setAdvisorOpen] = useState(false);
-  const { user } = useAuth();
-  const navigate = useNavigate();
 
-  const requireAuth = (cb: () => void) => {
-    if (!user) {
-      toast.error("Please sign in to use this feature");
-      navigate("/auth");
-      return;
-    }
+  const openFeature = (cb: () => void) => {
     cb();
   };
 
@@ -25,7 +15,7 @@ const FloatingActions: React.FC = () => {
     <>
       <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end">
         <button
-          onClick={() => requireAuth(() => setAdvisorOpen(true))}
+          onClick={() => openFeature(() => setAdvisorOpen(true))}
           className="group relative w-14 h-14 rounded-full bg-secondary border border-border/50 flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-105"
           title="Discuss with a Professional"
         >
@@ -36,7 +26,7 @@ const FloatingActions: React.FC = () => {
         </button>
 
         <button
-          onClick={() => requireAuth(() => setAiOpen(true))}
+          onClick={() => openFeature(() => setAiOpen(true))}
           className="group relative w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all hover:scale-105"
           title="AI Investment Advisor"
         >
