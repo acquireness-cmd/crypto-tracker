@@ -18,11 +18,6 @@ const Index: React.FC = () => {
   const navigate = useNavigate();
 
   const handleAlertClick = () => {
-    if (!user) {
-      toast.error("Please sign in to set price alerts");
-      navigate("/auth");
-      return;
-    }
     setAlertOpen(true);
   };
 

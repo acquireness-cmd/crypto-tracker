@@ -20,17 +20,18 @@ const AdvisorContact: React.FC<AdvisorContactProps> = ({ open, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
 
     setLoading(true);
     try {
-      const { error } = await supabase.from("contact_requests").insert({
-        user_id: user.id,
-        subject,
-        message,
-        budget: budget || null,
-      });
-      if (error) throw error;
+      if (user) {
+        const { error } = await supabase.from("contact_requests").insert({
+          user_id: user.id,
+          subject,
+          message,
+          budget: budget || null,
+        });
+        if (error) throw error;
+      }
       toast.success("Your request has been submitted! A professional advisor will contact you soon.");
       setSubject("");
       setMessage("");
