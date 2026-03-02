@@ -27,7 +27,12 @@ export const formatMarketCap = (value: number): string => {
 
 export const fetchCryptoAssets = async (): Promise<CryptoAsset[]> => {
   const res = await fetch(
-    "/api/crypto-markets"
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/crypto-markets`,
+    {
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+    }
   );
   if (!res.ok) throw new Error("Failed to fetch crypto data");
   const data = await res.json();
@@ -55,7 +60,14 @@ export interface MarketGlobal {
 }
 
 export const fetchMarketGlobal = async (): Promise<MarketGlobal> => {
-  const res = await fetch("/api/crypto");
+  const res = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/crypto-global`,
+    {
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+    }
+  );
   if (!res.ok) throw new Error("Failed to fetch global data");
   const { data } = await res.json();
 

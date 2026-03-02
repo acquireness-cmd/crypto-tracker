@@ -1,1 +1,7 @@
 project_id = "emarzreylprlftnoupxk"
+
+[functions.crypto-global]
+verify_jwt = false
+
+[functions.crypto-markets]
+verify_jwt = false
