@@ -27,7 +27,7 @@ export const formatMarketCap = (value: number): string => {
 
 export const fetchCryptoAssets = async (): Promise<CryptoAsset[]> => {
   const res = await fetch(
-    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=true&price_change_percentage=7d"
+    "/api/crypto-markets"
   );
   if (!res.ok) throw new Error("Failed to fetch crypto data");
   const data = await res.json();
