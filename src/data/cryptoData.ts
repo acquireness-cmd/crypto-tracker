@@ -25,6 +25,7 @@ export const formatMarketCap = (value: number): string => {
   return `$${value.toLocaleString()}`;
 };
 
+// Fetches top 20 crypto assets from CoinGecko via edge function
 export const fetchCryptoAssets = async (): Promise<CryptoAsset[]> => {
   const res = await fetch(
     `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/crypto-markets`,
