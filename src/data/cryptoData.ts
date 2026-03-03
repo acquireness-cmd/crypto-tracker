@@ -49,7 +49,7 @@ export const fetchCryptoAssets = async (): Promise<CryptoAsset[]> => {
     marketCap: coin.market_cap ?? 0,
     volume24h: coin.total_volume ?? 0,
     sparkline: coin.sparkline_in_7d?.price?.slice(-24) ?? [],
-    image: coin.image ?? "",
+    image: (coin.image ?? "").replace("/large/", "/small/"),
   }));
 };
 
