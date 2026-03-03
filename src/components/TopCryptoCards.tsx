@@ -29,7 +29,7 @@ const TopCryptoCards: React.FC = () => {
           <div key={coin.id} className={`glass-card rounded-xl p-5 ${i === 0 ? "glow-green" : ""}`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <img src={coin.image} alt={coin.name} className="w-6 h-6 rounded-full" />
+                <img src={coin.image} alt={coin.name} className="w-6 h-6 rounded-full" loading="lazy" width={24} height={24} decoding="async" />
                 <div>
                   <p className="text-sm text-muted-foreground">{coin.symbol}</p>
                   <p className="font-semibold">{coin.name}</p>

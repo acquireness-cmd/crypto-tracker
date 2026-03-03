@@ -84,7 +84,7 @@ const CryptoRow: React.FC<{ coin: CryptoAsset }> = ({ coin }) => {
       <td className="px-5 py-4 text-sm text-muted-foreground font-mono">{coin.rank}</td>
       <td className="px-5 py-4">
         <div className="flex items-center gap-3">
-          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
+          <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" loading="lazy" width={32} height={32} decoding="async" />
           <div>
             <span className="font-medium text-sm">{coin.name}</span>
             <span className="text-xs text-muted-foreground ml-2">{coin.symbol}</span>
