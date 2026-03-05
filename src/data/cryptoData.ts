@@ -56,14 +56,7 @@ export interface MarketGlobal {
 }
 
 export const fetchMarketGlobal = async (): Promise<MarketGlobal> => {
-  const res = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/crypto-global`,
-    {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-      },
-    }
-  );
+  const res = await fetch("https://api.coingecko.com/api/v3/global");
   if (!res.ok) throw new Error("Failed to fetch global data");
   const { data } = await res.json();
 
