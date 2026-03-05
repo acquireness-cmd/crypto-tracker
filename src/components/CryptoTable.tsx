@@ -11,6 +11,7 @@ const CryptoTable: React.FC = () => {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField>("rank");
   const [sortAsc, setSortAsc] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) setSortAsc(!sortAsc);
@@ -23,6 +24,8 @@ const CryptoTable: React.FC = () => {
       const diff = a[sortField] - b[sortField];
       return sortAsc ? diff : -diff;
     });
+
+  const displayedCoins = showAll ? filtered : filtered.slice(0, 20);
 
   const SortHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
     <button onClick={() => handleSort(field)} className="flex items-center gap-1 hover:text-foreground transition-colors">
@@ -52,26 +55,48 @@ const CryptoTable: React.FC = () => {
           <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="text-xs text-muted-foreground uppercase tracking-wider">
-                <th className="text-left px-5 py-3"><SortHeader field="rank">#</SortHeader></th>
-                <th className="text-left px-5 py-3">Name</th>
-                <th className="text-right px-5 py-3"><SortHeader field="price">Price</SortHeader></th>
-                <th className="text-right px-5 py-3"><SortHeader field="change24h">24h %</SortHeader></th>
-                <th className="text-right px-5 py-3 hidden md:table-cell"><SortHeader field="marketCap">Market Cap</SortHeader></th>
-                <th className="text-right px-5 py-3 hidden lg:table-cell">Volume (24h)</th>
-                <th className="text-right px-5 py-3 hidden lg:table-cell">Last 7d</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((coin) => (
-                <CryptoRow key={coin.id} coin={coin} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-xs text-muted-foreground uppercase tracking-wider">
+                  <th className="text-left px-5 py-3"><SortHeader field="rank">#</SortHeader></th>
+                  <th className="text-left px-5 py-3">Name</th>
+                  <th className="text-right px-5 py-3"><SortHeader field="price">Price</SortHeader></th>
+                  <th className="text-right px-5 py-3"><SortHeader field="change24h">24h %</SortHeader></th>
+                  <th className="text-right px-5 py-3 hidden md:table-cell"><SortHeader field="marketCap">Market Cap</SortHeader></th>
+                  <th className="text-right px-5 py-3 hidden lg:table-cell">Volume (24h)</th>
+                  <th className="text-right px-5 py-3 hidden lg:table-cell">Last 7d</th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayedCoins.map((coin) => (
+                  <CryptoRow key={coin.id} coin={coin} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {!showAll && filtered.length > 20 && (
+            <div className="flex justify-center py-4 border-t border-border/30">
+              <button
+                onClick={() => setShowAll(true)}
+                className="px-6 py-2 text-sm font-medium text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
+              >
+                Show More ({filtered.length - 20} more)
+              </button>
+            </div>
+          )}
+          {showAll && filtered.length > 20 && (
+            <div className="flex justify-center py-4 border-t border-border/30">
+              <button
+                onClick={() => setShowAll(false)}
+                className="px-6 py-2 text-sm font-medium text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted rounded-lg transition-colors"
+              >
+                Show Less
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
