@@ -11,6 +11,7 @@ const CryptoTable: React.FC = () => {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField>("rank");
   const [sortAsc, setSortAsc] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) setSortAsc(!sortAsc);
