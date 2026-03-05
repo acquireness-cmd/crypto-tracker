@@ -25,6 +25,8 @@ const CryptoTable: React.FC = () => {
       return sortAsc ? diff : -diff;
     });
 
+  const displayedCoins = showAll ? filtered : filtered.slice(0, 20);
+
   const SortHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
     <button onClick={() => handleSort(field)} className="flex items-center gap-1 hover:text-foreground transition-colors">
       {children}
