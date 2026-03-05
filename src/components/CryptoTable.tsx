@@ -69,13 +69,34 @@ const CryptoTable: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((coin) => (
+              {displayedCoins.map((coin) => (
                 <CryptoRow key={coin.id} coin={coin} />
               ))}
             </tbody>
           </table>
         </div>
-      )}
+        {!showAll && filtered.length > 20 && (
+          <div className="flex justify-center py-4 border-t border-border/30">
+            <button
+              onClick={() => setShowAll(true)}
+              className="px-6 py-2 text-sm font-medium text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
+            >
+              Show More ({filtered.length - 20} more)
+            </button>
+          </div>
+        )}
+        {showAll && filtered.length > 20 && (
+          <div className="flex justify-center py-4 border-t border-border/30">
+            <button
+              onClick={() => setShowAll(false)}
+              className="px-6 py-2 text-sm font-medium text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted rounded-lg transition-colors"
+            >
+              Show Less
+            </button>
+          </div>
+        )}
+      </>
+    )}
     </div>
   );
 };
