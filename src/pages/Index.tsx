@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Activity, Bell, LogOut, LogIn, LayoutDashboard } from "lucide-react";
+import { Activity, Bell, LogOut, LogIn } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -43,22 +43,13 @@ const Index: React.FC = () => {
               <span className="hidden sm:inline">Alerts</span>
             </button>
             {user ? (
-              <>
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  className="flex items-center gap-1.5 bg-secondary text-secondary-foreground px-3 py-1.5 rounded-lg text-sm hover:opacity-80 transition-opacity"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span className="hidden sm:inline">Dashboard</span>
-                </button>
-                <button
-                  onClick={signOut}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline">Sign Out</span>
-                </button>
-              </>
+              <button
+                onClick={signOut}
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
             ) : (
               <button
                 onClick={() => navigate("/auth")}
