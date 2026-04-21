@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { X, UserCheck, Send } from "lucide-react";
+import { X, UserCheck, Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface AdvisorContactProps {
   open: boolean;
@@ -11,6 +12,7 @@ interface AdvisorContactProps {
 
 const AdvisorContact: React.FC<AdvisorContactProps> = ({ open, onClose }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [budget, setBudget] = useState("");
@@ -21,24 +23,38 @@ const AdvisorContact: React.FC<AdvisorContactProps> = ({ open, onClose }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!user) {
+      toast.error("Please sign in to submit a consultation request.");
+      onClose();
+      navigate("/auth");
+      return;
+    }
+
+    if (!subject.trim() || !message.trim()) {
+      toast.error("Please fill in both subject and message.");
+      return;
+    }
+
     setLoading(true);
     try {
-      if (user) {
-        const { error } = await supabase.from("contact_requests").insert({
-          user_id: user.id,
-          subject,
-          message,
-          budget: budget || null,
-        });
-        if (error) throw error;
-      }
-      toast.success("Your request has been submitted! A professional advisor will contact you soon.");
+      const { error } = await supabase.from("contact_requests").insert({
+        user_id: user.id,
+        subject: subject.trim(),
+        message: message.trim(),
+        budget: budget || null,
+        status: "pending",
+      });
+      if (error) throw error;
+
+      toast.success(
+        "Your request has been submitted successfully. Our team will review it and contact you shortly."
+      );
       setSubject("");
       setMessage("");
       setBudget("");
       onClose();
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(err.message ?? "Failed to submit request. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -46,24 +62,35 @@ const AdvisorContact: React.FC<AdvisorContactProps> = ({ open, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-      <div className="glass-card rounded-xl w-full max-w-md p-6">
-        <div className="flex items-center justify-between mb-5">
+      <div className="glass-card rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <UserCheck className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-lg">Consult a Professional</h3>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Close"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-4">
-          Submit your investment query and a certified crypto advisor will get back to you. Pay only for the advice you need.
+        <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
+          Submit your investment query and our advisor will review your request.
+          You will be contacted soon after submission.
         </p>
+
+        {!user && (
+          <div className="mb-4 p-3 rounded-lg bg-muted/40 border border-border/50 text-xs text-muted-foreground">
+            You need to be signed in to submit a consultation request.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm text-muted-foreground mb-1 block">Subject</label>
+            <label className="text-sm font-medium mb-1.5 block">Subject</label>
             <input
               type="text"
               value={subject}
@@ -76,7 +103,9 @@ const AdvisorContact: React.FC<AdvisorContactProps> = ({ open, onClose }) => {
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground mb-1 block">Your Question / Requirements</label>
+            <label className="text-sm font-medium mb-1.5 block">
+              Your Question / Requirements
+            </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -89,7 +118,9 @@ const AdvisorContact: React.FC<AdvisorContactProps> = ({ open, onClose }) => {
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground mb-1 block">Budget (optional)</label>
+            <label className="text-sm font-medium mb-1.5 block">
+              Budget <span className="text-muted-foreground font-normal">(optional)</span>
+            </label>
             <select
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
@@ -108,9 +139,23 @@ const AdvisorContact: React.FC<AdvisorContactProps> = ({ open, onClose }) => {
             disabled={loading}
             className="w-full bg-primary text-primary-foreground rounded-lg py-3 font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            <Send className="w-4 h-4" />
-            {loading ? "Submitting..." : "Submit Request"}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                Submit Request
+              </>
+            )}
           </button>
+
+          <p className="text-xs text-muted-foreground text-center leading-relaxed pt-1">
+            Note: This request will be reviewed by our team. You will receive a
+            response via email or platform notification.
+          </p>
         </form>
       </div>
     </div>
