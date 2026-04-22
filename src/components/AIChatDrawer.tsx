@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X, Bot, Send, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -44,14 +46,27 @@ const AIChatDrawer: React.FC<AIChatDrawerProps> = ({ open, onClose }) => {
     };
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error("Please sign in to chat with the AI advisor.");
+        setIsLoading(false);
+        return;
+      }
+
       const resp = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ messages: [...messages, userMsg] }),
       });
+
+      if (resp.status === 401) {
+        upsertAssistant("⚠️ Your session expired. Please sign in again.");
+        setIsLoading(false);
+        return;
+      }
 
       if (resp.status === 429) {
         upsertAssistant("⚠️ Rate limit reached. Please try again in a moment.");
